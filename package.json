@@ -1,0 +1,28 @@
+{
+  "name": "dsh-visual-craft",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "index.js",
+  "files": [
+    "index.js",
+    "lib.js",
+    "cordis.patch.yml",
+    "skills",
+    "README.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "peerDependencies": {
+    "@deepseek-ai/dsh-tools": "*"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "agent-skill"
+  ],
+  "license": "MIT",
+  "description": "Agent Skill plus regex linter so slides and web UI do not look like default AI chrome."
+}
