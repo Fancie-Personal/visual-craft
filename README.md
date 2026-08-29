@@ -28,6 +28,8 @@ DeepSeek Harness 插件会注册 Skill，并提供 `check_visual_draft`（扫 HT
 npx @deepseek-ai/dsh plugin --profile desktop add /path/to/visual-craft
 ```
 
+装、验、自己加规则的步骤见 [DEVELOPER.md](DEVELOPER.md)。
+
 ## 自测
 
 ```sh
