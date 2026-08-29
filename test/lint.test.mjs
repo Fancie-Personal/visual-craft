@@ -13,6 +13,12 @@ test('flags purple AI chrome and Inter-only type', () => {
   assert.ok(hits.includes('purple-hex'))
   assert.ok(hits.includes('inter-only'))
   assert.ok(hits.includes('unlock'))
+  assert.ok(lintVisualText('body { color: #4f46e5; }', 'b.html').some((x) => x.id === 'purple-hex'))
+  assert.ok(lintVisualText('<div class="bg-violet-500">', 'c.html').some((x) => x.id === 'purple-name'))
+  assert.ok(lintVisualText('<div class="from-violet-500 text-violet-200">', 'v.html').some((x) => x.id === 'purple-name'))
+  assert.ok(lintVisualText('h1 { } /* 开启全新体验 */ 一站式解决方案', 's.html').some((x) => x.id === 'unlock'))
+  assert.ok(lintVisualText('body { font-family: Geist, sans-serif; }', 'd.html').some((x) => x.id === 'inter-only'))
+  assert.equal(lintVisualText('body { font-family: Inter, "PingFang SC", sans-serif; }', 'ok.html').some((x) => x.id === 'inter-only'), false)
 })
 
 test('flags three generic cards in a flex row', () => {
@@ -26,6 +32,14 @@ test('flags three generic cards in a flex row', () => {
   `
   const hits = lintVisualText(html, 'cards.html').map((x) => x.id)
   assert.ok(hits.includes('three-cards'))
+  const tailwind = `
+    <div class="grid grid-cols-3">
+      <div class="card">a</div>
+      <div class="card">b</div>
+      <div class="card">c</div>
+    </div>
+  `
+  assert.ok(lintVisualText(tailwind, 'tw.html').some((x) => x.id === 'three-cards'))
 })
 
 test('two panes named card do not trip three-cards', () => {
@@ -40,6 +54,8 @@ test('frost without a background is a finding', () => {
   const text = '.pane { backdrop-filter: blur(20px); color: white; }'
   const hits = lintVisualText(text, 'frost.css').map((x) => x.id)
   assert.deepEqual(hits, ['frost-on-empty'])
+  const white = 'body { background: #ffffff; } .pane { backdrop-filter: blur(20px); }'
+  assert.ok(lintVisualText(white, 'white.css').some((x) => x.id === 'frost-on-empty'))
 })
 
 test('flags gradient clipped titles and page blur', () => {
@@ -63,6 +79,11 @@ test('clean frost recipe passes', () => {
   `
   assert.deepEqual(lintVisualText(text, 'ok.css'), [])
   assert.match(formatLintReport([]), /通过/)
+  const inkBg = `
+    body { background-color: #0b0f19; }
+    .frost { backdrop-filter: blur(18px); }
+  `
+  assert.equal(lintVisualText(inkBg, 'ink-bg.css').length, 0)
 })
 
 test('recipe shown in pre does not trip too-many-frost', () => {
@@ -72,6 +93,12 @@ test('recipe shown in pre does not trip too-many-frost', () => {
     <pre>.frost { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }</pre>
   `
   assert.equal(lintVisualText(text, 'deck.html').some((x) => x.id === 'too-many-frost'), false)
+  const twoPanes = `
+    body { background-image: url(hero.jpg); }
+    .a { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+    .b { backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+  `
+  assert.equal(lintVisualText(twoPanes, 'two-frost.css').some((x) => x.id === 'too-many-frost'), false)
 })
 
 test('paper plus backdrop-filter is mix-material', () => {
@@ -82,11 +109,24 @@ test('paper plus backdrop-filter is mix-material', () => {
   `
   const hits = lintVisualText(text, 'mix.css').map((x) => x.id)
   assert.ok(hits.includes('mix-material'))
+  const ink = `
+    /* visual-craft: ink */
+    .ink { background: #fafafa; }
+    .x { backdrop-filter: blur(12px); background-color: #111; }
+  `
+  assert.ok(lintVisualText(ink, 'ink-mix.css').some((x) => x.id === 'mix-material'))
+  const studio = `
+    /* visual-craft: studio */
+    .studio { background: #111827; }
+    img { filter: blur(8px); }
+  `
+  assert.ok(lintVisualText(studio, 'studio-mix.css').some((x) => x.id === 'mix-material'))
 })
 
 test('flags slide canvas hairline', () => {
   const hits = lintVisualText('.slide { width: 1280px; border: 1px solid #fff; }', 'deck.css').map((x) => x.id)
   assert.ok(hits.includes('slide-hairline'))
+  assert.ok(lintVisualText('.slide { border-width: 1px; border-style: solid; }', 'w.css').some((x) => x.id === 'slide-hairline'))
 })
 
 test('skill frontmatter is kebab-case and mentions frost + PPT', () => {
@@ -99,4 +139,6 @@ test('skill frontmatter is kebab-case and mentions frost + PPT', () => {
   assert.match(skill.content, /\.paper/)
   assert.match(skill.content, /白边/)
   assert.match(skill.content, /background-clip/)
+  assert.match(skill.description, /海报/)
+  assert.match(skill.content, /扫得到/)
 })

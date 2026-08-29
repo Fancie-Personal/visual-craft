@@ -1,10 +1,6 @@
 ---
 name: visual-craft
-description: >-
-  Make slides, PPT, landing pages, dashboards, and UI that do not look like
-  default AI chrome. Use when the user asks for PPT, 幻灯片, 网页, 落地页,
-  dashboard, 磨砂, 玻璃拟态, frosted glass, glassmorphism, or when a draft
-  looks generic (purple gradient, Inter, three feature cards).
+description: Make slides, PPT, landing pages, dashboards, and UI that do not look like default AI chrome. Use when the user asks for PPT, 幻灯片, 网页, 落地页, 海报, 介绍页, dashboard, 磨砂, 玻璃拟态, 套模板, frosted glass, glassmorphism, or when a draft looks generic (purple gradient, Inter, three feature cards).
 ---
 
 # Visual Craft
@@ -27,6 +23,11 @@ description: >-
 ```
 
 做完后调用 `check_visual_draft`（若已安装）或按「禁区」自查，再交给用户。
+
+**质检边界**（过检 ≠ 好看）：
+
+- **扫得到**：紫靛色值与 Tailwind 紫类、裸西文栈（Inter / Geist / Poppins 等且无中文回退）、空话、三列 `.card`（含 `grid-cols-3`）、拉丁占位、霓虹 glow、无衬底磨砂、渐变裁剪字、材料混搭（paper / ink 混磨砂、studio 混 blur）、`.slide` 画布描边。`-webkit-backdrop-filter` 不另计一层磨砂。
+- **扫不到**：空盒子、16:9 黑边、PPT 编辑区浅线、python-pptx 母版白缝、同页字体/强调色过多——见下文「踩过的坑」，须人工自查
 
 ## 材料（只选一个）
 
@@ -135,18 +136,20 @@ PPT / 不支持 `backdrop-filter` 时：半透明色块 + 轻噪点，仍然是�
 
 ## 禁区（出现即视为失败，必须改）
 
-- 紫/靛渐变底 + 白字（含 `#6366f1` `#7c3aed` `#8b5cf6` 以及 “purple gradient hero”）
-- `font-family` 只用 Inter / Roboto / Arial 撑场面，且没有中文字体回退
+- 紫/靛渐变底 + 白字（含 `#6366f1` `#7c3aed` `#4f46e5` `#8b5cf6` 以及 `bg-indigo-` / `bg-violet-` / `from-violet` / “purple gradient hero”）
+- `font-family` 只用 Inter / Roboto / Arial / Geist / Poppins 等西文网字体撑场面，且**同一条声明里**没有 PingFang / 微软雅黑 / 思源等中文回退
 - 默认三列图标卡片当首页（`display:flex/grid` + 三个 `.card`）
-- “Unlock the power / Revolutionize / Next-generation / 赋能未来” 空话标题
+- “Unlock the power / Revolutionize / Next-generation / 赋能未来 / 一站式 / 开启全新” 空话标题
 - `lorem ipsum`
 - 每个按钮都加 glow
 - 渐变裁剪文字（`background-clip: text`）
-- 整页 `filter: blur()`
-- 同页超过 3 种字体、超过 4 种强调色
+- 整页 `filter: blur()`（studio 材料尤其禁止）
+- paper / ink 稿里出现 `backdrop-filter`；studio 稿里出现 `backdrop-filter` 或 `filter: blur`
+- 同页超过 3 种字体、超过 4 种强调色（**正则扫不到**，须人工自查）
 
 ## 交付
 
 - 网页：可打开的 HTML/CSS，或组件文件 + 一段「材料 / 三色 / 字号」说明。
-- PPT：页清单（每页一句话目的）+ 能打开的 HTML slides 或 pptx；关键页必须带材料签名。
+- PPT：页清单（每页一句话目的）+ 能打开的 HTML slides 或 pptx；关键页必须带材料签名。导出前按「踩过的坑」看四角像素和放映，不要等用户截编辑区白边再改。
+- 改本 Skill 或 `check_visual_draft` 时：先让 SKILL.md 与 `lib.js` 对齐，再改会断言 Skill 正文的测试；然后扫对照样本 / 规范样本 / 介绍页，确认条数后再改报告或幻灯片上的 n/n。不要先写「扫得到」之类断言再补说明书。
 - 回复里用中文说明选了哪种材料；用户要英文界面再把界面文案写成英文。

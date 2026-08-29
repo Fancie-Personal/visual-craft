@@ -2,7 +2,7 @@
 
 给 Agent 的前端 / 幻灯片设计约束。先选一种材料，再写页面；用正则扫已知套模板红线。
 
-不是微调模型。过检不等于好看。磨砂（frost）只是四种材料之一。
+不是微调模型。过检不等于好看。磨砂（frost）只是四种材料之一。不要拿 SKILL.md 当扫描对象。
 
 ## 装 Skill
 
@@ -16,7 +16,7 @@
 新开一轮对话后说：
 
 - 用 visual-craft 做一页磨砂质感的活动海报网页
-- 按 visual-craft 出 8 页项目介绍 PPT
+- 按 visual-craft 出项目介绍 PPT
 
 Cursor 等兼容 [Agent Skill](https://docs.cursor.com) 的工具，放同一份 `SKILL.md` 即可。
 

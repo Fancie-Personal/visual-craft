@@ -1,5 +1,5 @@
 import { readFileSync, statSync } from 'node:fs'
-import { extname, resolve } from 'node:path'
+import { basename, extname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineTool } from '@deepseek-ai/dsh-tools'
 import { formatLintReport, lintVisualText, parseSkillFrontmatter } from './lib.js'
@@ -30,7 +30,7 @@ export function apply(ctx) {
   ctx.tools.register(defineTool({
     name: 'check_visual_draft',
     description:
-      'Scan an HTML/CSS/Markdown visual draft for generic AI chrome (purple gradients, Inter-only type, empty slogans). Call before delivering PPT or web UI.',
+      '扫描 HTML/CSS/Markdown 草稿里的套模板红线（紫渐变、裸西文字体、空话标题等）。交付 PPT 或网页前调用。不看图、不打美观分。不要拿 SKILL.md 当扫描对象。',
     parameters: {
       path: {
         type: 'string',
@@ -47,6 +47,9 @@ export function apply(ctx) {
       const st = statSync(file)
       if (!st.isFile()) {
         return '路径不是文件。请传入单个 html/css/md/tsx。'
+      }
+      if (/^skill\.md$/i.test(basename(file))) {
+        return '不扫描 SKILL.md 说明书（正文会点名禁区色值和空话，用来扫会误伤）。请给页面或样式草稿。'
       }
       const ext = extname(file).toLowerCase()
       if (!['.html', '.css', '.md', '.tsx', '.jsx', '.svg', '.vue'].includes(ext)) {
