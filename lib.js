@@ -5,7 +5,6 @@ export const BANNED = [
   { id: 'lorem', re: /lorem ipsum/i, hint: '占位拉丁文' },
   { id: 'glow-everywhere', re: /box-shadow:[^;]{0,80}0\s+0\s+\d+px\s+(?:#|rgba\([^)]*255)/i, hint: '霓虹 glow' },
   { id: 'clip-text', re: /background-clip:\s*text|-webkit-background-clip:\s*text/i, hint: '渐变裁剪文字，像默认 AI 标题' },
-  { id: 'page-blur', re: /(?<!backdrop-)filter:\s*blur/i, hint: '整页或文字被 filter:blur，磨砂只允许做在面板上' },
   { id: 'slide-hairline', re: /\.slide\s*\{[^}]*(?:border:\s*1px|border-width:\s*1px)/i, hint: '幻灯片画布不要加浅色描边，投影和 PDF 会露出白边' },
 ]
 const THREE_CARDS = /class=["'][^"']*card[^"']*["'][\s\S]{0,1200}class=["'][^"']*card[^"']*["'][\s\S]{0,1200}class=["'][^"']*card[^"']*["']/i
@@ -14,6 +13,28 @@ const FLEX_CARDS = /\.cards\s*\{[^}]*display:\s*flex/i
 const WESTERN_ONLY = /(?:^|[,\s"'(])(?:Inter|Roboto|Arial|Geist|Plus Jakarta Sans|Poppins|Montserrat)(?:\s*['"])?(?:\s*,|\s*$)/i
 const CJK_FALLBACK = /PingFang|Hiragino|YaHei|Heiti|Noto Sans (?:SC|CJK)|Source Han|Microsoft YaHei|苹方|微软雅黑|思源/i
 const NEAR_WHITE = /#(?:fff(?:fff)?|fafafa|f8fafc|f4f4f5|f9fafb)\b/i
+
+// 装饰光斑的两个特征：模糊半径很大，或「绝对定位 + 圆形」的独立光球。
+// 它们不是「整页 / 文字 / 图片被模糊」，Skill 不禁。其余 filter: blur 仍然命中。
+const AMBIENT_BLUR_PX = 40
+
+function hasContentBlur(text) {
+  const re = /(?<!backdrop-)filter\s*:\s*blur\(\s*([\d.]+)/gi
+  for (const m of text.matchAll(re)) {
+    const radius = Number(m[1])
+    if (radius >= AMBIENT_BLUR_PX) continue
+    const open = text.lastIndexOf('{', m.index)
+    const close = text.lastIndexOf('}', m.index)
+    const insideRule = open > close
+    if (insideRule) {
+      const body = text.slice(open + 1, text.indexOf('}', m.index))
+      const orb = /position\s*:\s*(?:absolute|fixed)/i.test(body) && /border-radius\s*:\s*50%/i.test(body)
+      if (orb) continue
+    }
+    return true
+  }
+  return false
+}
 
 function hasInterOnlyFontStacks(text) {
   const decls = text.match(/font-family\s*:\s*[^;}{]+/gi) || []
@@ -62,6 +83,9 @@ export function lintVisualText(text, filename = 'draft') {
     if (rule.re.test(text)) {
       findings.push({ file: filename, id: rule.id, hint: rule.hint })
     }
+  }
+  if (hasContentBlur(text)) {
+    findings.push({ file: filename, id: 'page-blur', hint: '整页、文字或图片被 filter:blur，磨砂只允许做在面板上（装饰光斑不算）' })
   }
   if (hasInterOnlyFontStacks(text)) {
     findings.push({ file: filename, id: 'inter-only', hint: '只用西文网字体，缺少中文回退' })

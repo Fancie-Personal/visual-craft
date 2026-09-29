@@ -26,7 +26,7 @@ description: Make slides, PPT, landing pages, dashboards, and UI that do not loo
 
 **质检边界**（过检 ≠ 好看）：
 
-- **扫得到**：紫靛色值与 Tailwind 紫类、裸西文栈（Inter / Geist / Poppins 等且无中文回退）、空话、三列 `.card`（含 `grid-cols-3`）、拉丁占位、霓虹 glow、无衬底磨砂、渐变裁剪字、材料混搭（paper / ink 混磨砂、studio 混 blur）、`.slide` 画布描边。`-webkit-backdrop-filter` 不另计一层磨砂。
+- **扫得到**：紫靛色值与 Tailwind 紫类、裸西文栈（Inter / Geist / Poppins 等且无中文回退）、空话、三列 `.card`（含 `grid-cols-3`）、拉丁占位、霓虹 glow、无衬底磨砂、渐变裁剪字、整页/文字/图片 `filter: blur`、材料混搭（paper / ink 混磨砂、studio 混 blur）、`.slide` 画布描边。`-webkit-backdrop-filter` 不另计一层磨砂；背景装饰光斑（模糊半径 ≥ 40px，或绝对定位的圆形光球）不算整页模糊。
 - **扫不到**：空盒子、16:9 黑边、PPT 编辑区浅线、python-pptx 母版白缝、同页字体/强调色过多——见下文「踩过的坑」，须人工自查
 
 ## 材料（只选一个）

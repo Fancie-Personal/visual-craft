@@ -66,6 +66,11 @@ test('flags gradient clipped titles and page blur', () => {
   const hits = lintVisualText(text, 'chrome.css').map((x) => x.id)
   assert.ok(hits.includes('clip-text'))
   assert.ok(hits.includes('page-blur'))
+  const hasBlur = (css) => lintVisualText(css, 'b.css').some((x) => x.id === 'page-blur')
+  assert.equal(hasBlur('body { filter: blur(4px); }'), true)
+  assert.equal(hasBlur('<h1 style="filter: blur(3px)">x</h1>'), true)
+  assert.equal(hasBlur('.blob { position: absolute; border-radius: 50%; filter: blur(6px); }'), false)
+  assert.equal(hasBlur('.g3 { width: 620px; filter: blur(120px); }'), false)
 })
 
 test('clean frost recipe passes', () => {
